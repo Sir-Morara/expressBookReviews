@@ -1,5 +1,5 @@
 let books = {
-      1: { "isbn": "978-1-56619-909-4", "author": "Chinua Achebe", "title": "Things Fall Apart", "reviews": {
+      "978-1-56619-909-4": { "isbn": "978-1-56619-909-4", "author": "Chinua Achebe", "title": "Things Fall Apart", "reviews": {
         "user1": "An insightful and powerful novel.",
         "user2": "A classic that provides a deep cultural perspective."
       }},
