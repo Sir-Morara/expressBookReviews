@@ -40,7 +40,7 @@ public_users.post("/login", (req, res) => {
   }
 
   // Create a JWT token
-  const token = jwt.sign({ username }, 'your_jwt_secret', { expiresIn: '1h' });
+  const token = jwt.sign({ username }, 'v@2h#8iL$5nR8!qX', { expiresIn: '1h' });
 
   // Respond with the token
   return res.status(200).json({ token });
