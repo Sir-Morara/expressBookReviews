@@ -14,8 +14,9 @@ public_users.post("/register", (req,res) => {
 public_users.get('/',function (req, res) {
   //Write your code here
   const bookList = books;
-  res.json(bookList);
+  
   res.setHeader('Content-Type', 'application/json');
+  res.json(bookList);
 
 });
 
@@ -29,6 +30,7 @@ public_users.get('/isbn/:isbn',function (req, res) {
   } else {
     res.status(404).json({ message: "Book not found" });
   }
+  
 });
 
   
