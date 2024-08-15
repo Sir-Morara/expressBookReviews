@@ -1,28 +1,28 @@
 const express = require('express');
 const jwt = require ('jsonwebtoken')
-const session = express ('express-session')
+const session = require ('express-session')
+const bcrypt = require ('bcryptjs');
 let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
 
 
-public_users.post("/register", (req,res) => {
-  //Write your code here
+public_users.post("/register", (req, res) => {
   const { username, password } = req.body;
 
-  // Check if both username and password are provided
+  
   if (!username || !password) {
-    return res.status(400).json({ message: "Username and password are required" });
+      return res.status(400).json({ message: "Username and password are required" });
   }
 
-  // Check if the username already exists
+  
   if (users[username]) {
-    return res.status(400).json({ message: "Username already exists" });
+      return res.status(400).json({ message: "Username already exists" });
   }
 
-  // Register the new user
-  users[username] = { password };
+  const hashedPassword = bcrypt.hashSync(password, 10); // Hash password
+  users[username] = { password: hashedPassword };
   return res.status(201).json({ message: "User registered successfully" });
 });
 
@@ -30,19 +30,19 @@ public_users.post("/login", (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
-    return res.status(400).json({ message: "Username and password are required" });
+      return res.status(400).json({ message: "Username and password are required" });
   }
 
   const user = users[username];
 
-  if (!user || user.password !== password) {
-    return res.status(401).json({ message: "Invalid username or password" });
+  if (!user || !bcrypt.compareSync(password, user.password)) { // Verify hashed password
+      return res.status(401).json({ message: "Invalid username or password" });
   }
 
-  // Create a JWT token
+  
   const token = jwt.sign({ username }, 'v@2h#8iL$5nR8!qX', { expiresIn: '1h' });
-
-  // Respond with the token
+  
+  
   return res.status(200).json({ token });
 });
 

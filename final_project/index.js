@@ -21,7 +21,7 @@ app.use("/customer/auth/*", function auth(req,res,next){
 
     jwt.verify(token, 'v@2h#8iL$5nR8!qX', (err, decoded) => { // Replace 'your_jwt_secret' with your actual secret
         if (err) return res.status(401).json({ message: 'Failed to authenticate token' });
-        req.userId = decoded.id; // Example of adding user info to request
+        req.userId = decoded.username; // Example of adding user info to request
         next();
     });
 });
