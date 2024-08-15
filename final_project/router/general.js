@@ -16,8 +16,7 @@ public_users.get('/',function (req, res) {
   const bookList = books;
   res.json(bookList);
   res.setHeader('Content-Type', 'application/json');
-  res.send(JSON.stringify(bookList, null, 2));
-  return res.status(300).json({message: "Yet to be implemented"});
+
 });
 
 // Get book details based on ISBN
