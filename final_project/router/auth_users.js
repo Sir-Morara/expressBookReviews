@@ -5,7 +5,9 @@ const secretKey = 'v@2h#8iL$5nR8!qX'; // Updated secret key
 let books = require("./booksdb.js");
 const regd_users = express.Router();
 
-let users = {};
+let users = {
+"testuser": { password: "testpassword" }
+};
 
 const isValid = (username) =>{ 
     return Object.keys(users).includes(username);
