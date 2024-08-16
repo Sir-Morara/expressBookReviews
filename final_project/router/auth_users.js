@@ -7,7 +7,8 @@ const regd_users = express.Router();
 
 let users = {};
 
-const isValid = (username) => { // Check if username exists
+const isValid = (username) => users.some(user => user.username === username);
+{ // Check if username exists
     return Object.keys(users).includes(username);
 }
 
