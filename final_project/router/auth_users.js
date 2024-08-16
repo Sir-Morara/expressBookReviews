@@ -5,9 +5,7 @@ const secretKey = 'v@2h#8iL$5nR8!qX'; // Updated secret key
 let books = require("./booksdb.js");
 const regd_users = express.Router();
 
-let users = {
-"testuser": { password: "testpassword" }
-};
+let users = {};
 
 const isValid = (username) =>{ 
     return Object.keys(users).includes(username);
@@ -70,35 +68,28 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
 regd_users.delete("/auth/review/:isbn", (req, res) => {
   const token = req.headers['authorization']?.split(' ')[1];
   const { isbn } = req.params;
-
+  
   if (!token) {
-    return res.status(403).json({ message: "No token provided" });
+      return res.status(403).json({ message: "No token provided" });
   }
 
   try {
-    const decoded = jwt.verify(token, secretKey);
-    req.username = decoded.username; // Attach username to request object
+      const decoded = jwt.verify(token, secretKey);
+      const username = decoded.username;
+      
+      if (!books[isbn]) {
+          return res.status(404).json({ message: "Book not found" });
+      }
+
+      if (!books[isbn].reviews[username]) {
+          return res.status(404).json({ message: "Review not found for this user" });
+      }
+
+      delete books[isbn].reviews[username];
+      res.json({ message: "Review deleted successfully" });
   } catch (err) {
-    return res.status(403).json({ message: "Invalid token" });
+      res.status(403).json({ message: "Invalid token" });
   }
-
-  if (!isbn) {
-    return res.status(400).json({ message: "ISBN is required" });
-  }
-
-  if (!books[isbn]) {
-    return res.status(404).json({ message: "Book not found" });
-  }
-
-  const userReviews = books[isbn].reviews;
-
-  if (!userReviews || !userReviews[req.username]) {
-    return res.status(404).json({ message: "Review not found for this user" });
-  }
-
-  delete userReviews[req.username];
-  
-  res.json({ message: "Review deleted successfully" });
 });
 
 
