@@ -7,19 +7,18 @@ const regd_users = express.Router();
 
 let users = {
   "testuser": {
-      password: "testpassword"
+    password: bcrypt.hashSync("testpassword", 10) // Hash the password for testuser
   },
   // Add other users here
 };
 
-
-const isValid = (username) =>{ 
+const isValid = (username) => {
     return Object.keys(users).includes(username);
-}
+};
 
-const authenticatedUser = (username, password) => { // Compare hashed password
+const authenticatedUser = (username, password) => {
     return users[username] && bcrypt.compareSync(password, users[username].password);
-}
+};
 
 regd_users.post("/login", (req, res) => {
     const { username, password } = req.body;
@@ -72,30 +71,30 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
 });
 
 regd_users.delete("/auth/review/:isbn", (req, res) => {
-  const token = req.headers['authorization']?.split(' ')[1];
-  const { isbn } = req.params;
-  
-  if (!token) {
-      return res.status(403).json({ message: "No token provided" });
-  }
+    const token = req.headers['authorization']?.split(' ')[1];
+    const { isbn } = req.params;
 
-  try {
-      const decoded = jwt.verify(token, secretKey);
-      const username = decoded.username;
-      
-      if (!books[isbn]) {
-          return res.status(404).json({ message: "Book not found" });
-      }
+    if (!token) {
+        return res.status(403).json({ message: "No token provided" });
+    }
 
-      if (!books[isbn].reviews[username]) {
-          return res.status(404).json({ message: "Review not found for this user" });
-      }
+    try {
+        const decoded = jwt.verify(token, secretKey);
+        const username = decoded.username;
+        
+        if (!books[isbn]) {
+            return res.status(404).json({ message: "Book not found" });
+        }
 
-      delete books[isbn].reviews[username];
-      res.json({ message: "Review deleted successfully" });
-  } catch (err) {
-      res.status(403).json({ message: "Invalid token" });
-  }
+        if (!books[isbn].reviews || !books[isbn].reviews[username]) {
+            return res.status(404).json({ message: "Review not found for this user" });
+        }
+
+        delete books[isbn].reviews[username];
+        res.json({ message: "Review deleted successfully" });
+    } catch (err) {
+        res.status(403).json({ message: "Invalid token" });
+    }
 });
 
 
