@@ -1,24 +1,23 @@
 const express = require('express');
-const jwt = require ('jsonwebtoken')
-const session = require ('express-session')
-const bcrypt = require ('bcryptjs');
-let books = require("./booksdb.js");
-let isValid = require("./auth_users.js").isValid;
-let users = require("./auth_users.js").users;
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+let books = require('./booksdb.js');
+let isValid = require('./auth_users.js').isValid;
+let users = require('./auth_users.js').users;
 const public_users = express.Router();
 
-
+// Register new user
 public_users.post("/register", (req, res) => {
   const { username, password } = req.body;
 
-  
+
   if (!username || !password) {
-      return res.status(400).json({ message: "Username and password are required" });
+    return res.status(400).json({ message: "Username and password are required" });
   }
 
-  
+
   if (users[username]) {
-      return res.status(400).json({ message: "Username already exists" });
+    return res.status(400).json({ message: "Username already exists" });
   }
 
   const hashedPassword = bcrypt.hashSync(password, 10); // Hash password
@@ -26,39 +25,35 @@ public_users.post("/register", (req, res) => {
   return res.status(201).json({ message: "User registered successfully" });
 });
 
+// Login user
 public_users.post("/login", (req, res) => {
   const { username, password } = req.body;
 
   if (!username || !password) {
-      return res.status(400).json({ message: "Username and password are required" });
+    return res.status(400).json({ message: "Username and password are required" });
   }
 
   const user = users[username];
 
   if (!user || !bcrypt.compareSync(password, user.password)) { // Verify hashed password
-      return res.status(401).json({ message: "Invalid username or password" });
+    return res.status(401).json({ message: "Invalid username or password" });
   }
 
-  
+
   const token = jwt.sign({ username }, 'v@2h#8iL$5nR8!qX', { expiresIn: '1h' });
-  
-  
+
+
   return res.status(200).json({ token });
 });
 
 // Get the book list available in the shop
-public_users.get('/',function (req, res) {
-  //Write your code here
-  const bookList = books;
-  
+public_users.get('/', (req, res) => {
   res.setHeader('Content-Type', 'application/json');
-  res.json(bookList);
-
+  res.json(books);
 });
 
 // Get book details based on ISBN
-public_users.get('/isbn/:isbn',function (req, res) {
-  //Write your code here
+public_users.get('/isbn/:isbn', (req, res) => {
   const isbn = req.params.isbn;
   const book = Object.values(books).find(book => book.isbn === isbn);
   if (book) {
@@ -66,13 +61,12 @@ public_users.get('/isbn/:isbn',function (req, res) {
   } else {
     res.status(404).json({ message: "Book not found" });
   }
-  
+
 });
 
-  
+
 // Get book details based on author
-public_users.get('/author/:author',function (req, res) {
-  //Write your code here
+public_users.get('/author/:author', (req, res) => {
   const author = req.params.author;
   const booksByAuthor = Object.values(books).filter(book => book.author === author);
 
@@ -84,8 +78,7 @@ public_users.get('/author/:author',function (req, res) {
 });
 
 // Get all books based on title
-public_users.get('/title/:title',function (req, res) {
-  //Write your code here
+public_users.get('/title/:title', (req, res) => {
   const title = req.params.title;
   const booksByTitle = Object.values(books).filter(book => book.title.toLowerCase().includes(title.toLowerCase()));
 
@@ -96,9 +89,8 @@ public_users.get('/title/:title',function (req, res) {
   }
 });
 
-//  Get book review
-public_users.get('/review/:isbn',function (req, res) {
-  //Write your code here
+// Get book review
+public_users.get('/review/:isbn', (req, res) => {
   const isbn = req.params.isbn;
   const book = Object.values(books).find(book => book.isbn === isbn);
 
